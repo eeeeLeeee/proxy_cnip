@@ -1,0 +1,3 @@
+[submodule "china_ip_list"]
+	path = china_ip_list
+	url = https://github.com/17mon/china_ip_list
