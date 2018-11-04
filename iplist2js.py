@@ -148,7 +148,7 @@ def main():
     }
 
     print('var cn_tree = %s;' % ip_file_to_js('./china_ip_list/china_ip_list.txt', **json_opts))
-    print('var reserved_tree = %s;' % ip_file_to_js('./china_ip_list/china_ip_list.txt', **json_opts))
+    print('var reserved_tree = %s;' % ip_file_to_js('reserved.txt', **json_opts))
 
     domain_list = list(lines('paper-domains.txt'))
     print('var paper_list = %s;' % json.dumps(domain_list, **json_opts))
