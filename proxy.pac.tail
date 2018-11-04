@@ -1,0 +1,121 @@
+
+// TODO: binary search is sufficient
+// TODO: test chrome, IE
+// TODO: merge trees
+// TODO: adblock
+// BUG: dnsResolve will fail on ipv6 hosts
+
+// a tree representing a bounch of network (ip address with prefix)
+// an ip is in tree if a braunch in ip_tree matches an ip
+//var cn_tree = [...];	// auto-generated from chnroutes.txt by iplist2js.py
+////var paper_tree = [...];	// auto-generated from paper-sites.txt by iplist2js.py
+//var reserved_tree = [...];	// auto-generated from reserved.txt by iplist2js.py
+//var paper_list = [...];	// auto-generated from paper-domains.txt by iplist2js.py
+
+// var proxy = 'PROXY 127.0.0.1:8087';
+var proxy = 'SOCKS5 127.0.0.1:1080';
+var blackhole = 'PROXY 127.0.0.1:8086';
+var noproxy = 'DIRECT';
+
+
+var domain_in_list = function(domain, domain_list)
+{
+	'use strict';
+	domain = domain.toLowerCase();
+	
+	function endsWith(str, suffix)
+	{
+		return str.indexOf(suffix, str.length - suffix.length) !== -1;
+	}
+	
+	for(var i = 0; i < domain_list.length; i++)
+	{
+		var item = domain_list[i];
+		if(domain === item)
+		{
+			return true;
+		}
+		if(endsWith(domain, '.'+item))
+		{
+			return true;
+		}
+	}
+	return false;
+};
+
+var ip_in_tree = function(ip, ip_tree)
+{
+	'use strict';
+	// convert a ip string to a array of binary bits
+	var ip_to_bin_array  = function(ip)
+	{
+		// convert a byte to a array of binary bits
+		var byte_to_array = function(byte)
+		{
+			var masks = [
+				0b10000000, 0b01000000, 0b00100000, 0b00010000,
+				0b00001000, 0b00000100, 0b00000010, 0b00000001
+			];
+			var ret = [];
+			for(var i = 0; i < 8; i++)
+			{
+				ret.push(Number(Boolean(byte & masks[i])));
+			}
+			return ret;
+		};
+		
+		var ip_array = ip.split('.').map(function(element, b, c){ return parseInt(element); });
+		
+		var bin_array = [];
+		for(var i = 0; i < 4; i++)
+		{
+			var b = ip_array[i];
+			bin_array = bin_array.concat(byte_to_array(b));
+		}
+		
+		return bin_array;
+	};
+
+	var bin_in_tree = function(tree, bin)
+	{
+		var tree_is_end = function(node)
+		{
+			return node[0] === null && node[1] === null;
+		};
+		
+		if(tree_is_end(tree))
+		{
+			return true;
+		}
+		else if(tree[bin[0]] === null)
+		{
+			return false;
+		}
+		else
+		{
+			return bin_in_tree(tree[bin[0]], bin.slice(1));
+		}
+	};
+
+	var bin_array = ip_to_bin_array(ip);
+	return bin_in_tree(ip_tree, bin_array);
+};
+
+function FindProxyForURL(url, host)
+{
+	'use strict';
+	if(localHostOrDomainIs(host, "host.in.white.list"))
+	{
+		return noproxy; 
+	}
+	
+	var ip = dnsResolve(host);
+	if(!ip || ip_in_tree(ip, cn_tree) || ip_in_tree(ip, reserved_tree) || domain_in_list(host, paper_list))
+	{
+		return noproxy;
+	}
+	else
+	{
+		return proxy;
+	}
+}

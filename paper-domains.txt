@@ -1,0 +1,28 @@
+acm.org
+acs.org
+afst.cedram.org
+aiaa.org
+ams.org
+aps.org
+asme.org
+berkeley.edu
+ems-ph.org
+ieee.org
+journals.cambridge.org
+projecteuclid.org
+rsc.org
+sciencedirect.com
+sciencemag.org
+siam.org
+spie.org
+cas.org
+reaxys.com
+sci-hub.io
+bookzz.org
+# libgen.io
+# golibgen.io
+nrcresearchpress.com
+books24x7.com
+thieme.de
+wiley.com
+nature.com
